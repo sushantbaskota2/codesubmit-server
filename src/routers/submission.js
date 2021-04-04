@@ -1,5 +1,7 @@
 const express = require('express');
 const axios = require('axios');
+const Submission = require('../db/models/submission');
+const Problem = require('../db/models/problem');
 const router = express.Router();
 const CLIENT_ID = process.env.JDOODLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.JDOODLE_CLIENT_SECRET;
@@ -14,6 +16,33 @@ router.post('/solve', async (req, res) => {
     } catch (e) {
         console.log(e);
         res.status(400).send(e);
+    }
+});
+
+router.post('/submissions', async (req, res) => {
+    const { problemId, score, studentId, submissionCode } = req.body;
+
+    const submission = new Submission({ problemId, studentId, submissionCode, score });
+    try {
+        await submission.save();
+        res.send(submission);
+    } catch (e) {
+        console.log(e);
+        res.send(e);
+    }
+});
+
+router.get('/submissions', async (req, res) => {
+    try {
+        const submissions = await Submission.find({});
+        const submissionRef = [];
+        for (let i = 0; i < submissions.length; i++) {
+            const problem = await Problem.findById(submissions[i].problemId);
+            submissionRef.push({ score: submissions[i].score, title: problem.title });
+        }
+        res.send(submissionRef);
+    } catch (error) {
+        res.send(error);
     }
 });
 

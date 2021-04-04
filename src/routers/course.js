@@ -53,7 +53,7 @@ router.get('/courses/:author', auth, async (req, res) => {
             throw new Error('You cannot access courses that you are not an author of');
         } else {
             const courses = await Course.find({ author: req.user._id });
-            courses.length === 0 ? res.status(404).send({ message: 'No course found' }) : '';
+            // courses.length === 0 ? res.status(404).send({ message: 'No course found' }) : '';
             res.send(courses);
         }
     } catch (error) {
@@ -61,6 +61,12 @@ router.get('/courses/:author', auth, async (req, res) => {
     }
 });
 
+router.get('/course/:id', async (req, res) => {
+    try {
+        const courses = Course.findById(req.params.id);
+        res.send(courses);
+    } catch (error) {}
+});
 //Enroll a Student in a course --NEEDS AUTHENTICATION ---
 
 router.post('/courses/enroll/:courseId', auth, async (req, res) => {

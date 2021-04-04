@@ -79,4 +79,13 @@ router.get('/users/students', async (req, res) => {
     }
 });
 
+router.get('/courses/:id/students', async (req, res) => {
+    const courseId = req.params.id;
+    try {
+        const users = await User.find({});
+        let filteredUsers = users.filter((user) => user.courses.includes(courseId));
+        res.send(filteredUsers);
+    } catch (error) {}
+});
+
 module.exports = router;

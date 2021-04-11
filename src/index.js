@@ -7,7 +7,7 @@ const courseRouter = require('./routers/course');
 const problemRouter = require('./routers/problem');
 const submissionRouter = require('./routers/submission');
 const cors = require('cors');
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(userRouter);

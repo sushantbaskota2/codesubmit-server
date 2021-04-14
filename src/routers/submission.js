@@ -31,6 +31,28 @@ router.get('/instructor/submissions', auth, async (req, res) => {
     res.send(submissions);
 });
 
+router.get('/instructor/submissions/:id', async (req, res) => {
+    try {
+        const submission = await Submission.findById(req.params.id);
+        const student = await User.findById(submission.studentId);
+        const problem = await Problem.findById(submission.problemId);
+        const course = await Course.findById(problem.courseID);
+        res.send({
+            submission,
+            student,
+            problem,
+            course
+        });
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+router.patch('/submissions/:id', auth, async (req, res) => {
+    const { score } = req.body;
+    const submission = await Submission.findByIdAndUpdate(req.params.id, { score });
+    res.send(submission);
+});
 router.post('/solve', async (req, res) => {
     const { studentCode, testcases } = req.body;
 
@@ -60,11 +82,8 @@ router.get('/submissions', async (req, res) => {
     try {
         const submissions = await Submission.find({});
         const submissionRef = [];
-        for (let i = 0; i < submissions.length; i++) {
-            const problem = await Problem.findById(submissions[i].problemId);
-            submissionRef.push({ score: submissions[i].score, title: problem.title });
-        }
-        res.send(submissionRef);
+
+        res.send(submissions);
     } catch (error) {
         res.send(error);
     }

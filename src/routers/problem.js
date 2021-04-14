@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Problem = require('../db/models/problem');
+const Course = require('../db/models/course');
 const auth = require('../middleware/auth');
 //Add a problem
 router.post('/problems', auth, async (req, res) => {
@@ -81,11 +82,35 @@ router.get('/problems/:courseID', async (req, res) => {
 //Update a problem
 router.patch('/problems/:id', async (req, res) => {
     try {
+        console.log(req.body);
+
         const problem = await Problem.findByIdAndUpdate(req.params.id, { ...req.body });
-        await problem.save();
+        console.log(problem);
         res.send({ message: 'Changes made.' });
     } catch (error) {
+        console.log(error);
         res.send({ message: 'Error updating' });
+    }
+});
+
+router.get('/instructor/problem/:id', async (req, res) => {
+    try {
+        const problem = await Problem.findById(req.params.id);
+        const course = await Course.findById(problem.courseID);
+        const result = {
+            problemName: problem.title,
+            courseID: course.courseID,
+            testcases: problem.testcases,
+            code: problem.starterCode,
+            description: problem.description,
+            assign: problem.assign
+        };
+
+        console.log(problem);
+
+        res.send(result);
+    } catch (e) {
+        res.send(e);
     }
 });
 
